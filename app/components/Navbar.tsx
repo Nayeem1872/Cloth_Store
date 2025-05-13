@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 import ThemeToggle1 from "./ThemeToggle";
 import { useIsMobile } from "../hooks/use-mobile";
+import Image from "next/image";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,9 +43,15 @@ const Navbar = () => {
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <a href="#" className="flex items-center">
-          <span className="text-2xl font-bold gradient-text">FashionLink</span>
-        </a>
+        <div className="flex items-center">
+          <Image
+            src="/images/logo.png"
+            alt="FashionLink Logo"
+            width={50}
+            height={50}
+          />{" "}
+          <span className="text-2xl font-bold gradient-text">R TRADE</span>
+        </div>
 
         {!isMobile ? (
           <div className="flex items-center gap-8">

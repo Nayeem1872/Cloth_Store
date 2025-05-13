@@ -1,6 +1,23 @@
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, useCycle, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
+
+import { ReactNode } from "react";
+
+const InteractiveHoverButton = ({ children }: { children: ReactNode }) => {
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="bg-gradient-to-r from-[#274AFD] to-[#6E70F2] text-white 
+                 font-medium py-4 px-8 rounded-full shadow-lg 
+                 hover:shadow-xl transition-all"
+    >
+      {children}
+    </motion.button>
+  );
+};
 
 const Hero = () => {
   const scrollToAbout = () => {
@@ -38,7 +55,7 @@ const Hero = () => {
       transition: {
         duration: 4,
         repeat: Infinity,
-        repeatType: "reverse" as const,
+        repeatType: "mirror",
         ease: "easeInOut",
       },
     },
@@ -69,6 +86,44 @@ const Hero = () => {
     },
   };
 
+  const variants = {
+    pos1: { left: "50%", top: "-105px", x: "-50%", y: "6rem" },
+    pos2: { left: "6%", top: "52%", x: "-100%", y: "0%" },
+    pos3: { left: "94%", top: "52%", x: "0%", y: "0%" },
+  };
+
+  // Only cycle the dot
+  const [dotPos, cycleDot] = useCycle("pos1", "pos2", "pos3");
+
+  useEffect(() => {
+    const id = setInterval(cycleDot, 4000);
+    return () => clearInterval(id);
+  }, [cycleDot]);
+
+  const slides = [
+    // Slide 1
+    <>
+      Pixel-Perfect UI/UX Design for a<br />
+      Seamless User Experience
+    </>,
+    // Slide 2
+    <>Custom WordPress Website, Flexible, Scalable & SEO Friendly</>,
+    // Slide 3
+    <>
+      SaaS Website Design & Development
+      <br />
+      for Maximum Conversions
+    </>,
+  ];
+
+  const [current, cycle] = useCycle(0, 1, 2);
+
+  // Every 4s, advance
+  useEffect(() => {
+    const id = setInterval(() => cycle(), 4000);
+    return () => clearInterval(id);
+  }, [cycle]);
+
   return (
     <section
       id="home"
@@ -80,7 +135,7 @@ const Hero = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5 }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-secondary/30 dark:from-primary/10 dark:to-secondary/10 z-10"></div>
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-secondary/30 dark:from-primary/10 dark:to-secondary/10 z-10"></div> */}
         <motion.div
           className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1581092854584-2d5ba3eeb14d?q=80&w=1974')] bg-cover bg-center"
           initial={{ scale: 1.2, opacity: 0 }}
@@ -89,74 +144,32 @@ const Hero = () => {
         ></motion.div>
       </motion.div>
 
-      <motion.div
-        className="container mx-auto px-4 z-10"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.div
-          className="max-w-3xl mx-auto text-center"
-          variants={containerVariants}
-        >
-          <motion.h1
-            className="text-4xl md:text-6xl font-bold mb-6"
-            variants={itemVariants}
-          >
-            <motion.span
-              className="gradient-text inline-block"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
+      {/* Hero Content */}
+      <div className="relative z-10 text-center max-w-[876px] mx-auto px-4">
+        <h1 className="font-bold text-[48px] leading-[1.1] tracking-tight mb-6 text-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.6 }}
+              className="inline-block bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-gray-100 dark:via-blue-400 dark:to-gray-100 bg-clip-text text-transparent"
             >
-              Global Clothing
-            </motion.span>
-            <br />
-            <motion.span
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
-              Sourcing Excellence
-            </motion.span>
-          </motion.h1>
-
-          <motion.p
-            className="text-xl md:text-2xl mb-8 opacity-90 max-w-2xl mx-auto"
-            variants={itemVariants}
-          >
-            Connecting premium clothing manufacturers with global brands through
-            sustainable and ethical partnerships.
-          </motion.p>
-
-          <motion.div
-            className="flex flex-col md:flex-row gap-4 justify-center"
-            variants={itemVariants}
-          >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/80 text-white rounded-full px-8 shadow-lg hover:shadow-xl transition-all"
-              >
-                Our Services
-              </Button>
+              {slides[current]}
             </motion.div>
-
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-primary text-primary hover:text-primary-foreground rounded-full px-8 shadow-lg hover:shadow-xl transition-all"
-              >
-                Partner With Us
-              </Button>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </AnimatePresence>
+        </h1>
+        <p className="text-lg md:text-xl text-gray-800 dark:text-gray-200 mb-8 max-w-2xl mx-auto">
+          We design and develop stunning, high-performing websites for SaaS
+          products to maximize conversions.
+        </p>
+        <InteractiveHoverButton>Book A Call</InteractiveHoverButton>
+      </div>
 
       <motion.div
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-        variants={floatingVariants}
+        // variants={floatingVariants}
         initial="initial"
         animate="animate"
       >
